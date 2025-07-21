@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot name="arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename = "common_properties.xacro" />
+
+  <xacro:include filename = "arm.xacro" />
+  
+<!--   This is the main file for robot which include other files specific for different components of the robot    -->
+<!-- here sequence of including files is important -->
+</robot>

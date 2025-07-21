@@ -1,0 +1,31 @@
+<launch>
+    <arg name="urdf_path" default="$(find my_urdf_description)/urdf/my_urdf.xacro" />
+    <arg name="rviz_config_path" default="$(find my_urdf_description)/rviz/urdf_config.rviz" />
+    
+    <node pkg="robot_state_publisher" exec="robot_state_publisher" output="screen">
+        <param name="robot_description" value="$(command xacro $(var urdf_path))" />
+    </node>
+
+    <include file="$(find gazebo_ros)/launch/gazebo.launch.py">
+        <arg name="world" value="$(find my_urdf_description)/world/rough_terrain.world" />
+    </include>
+
+    <node pkg="controller_manager" exec="ros2_control_node" output="screen" name="controller_manager">
+        <param name="robot_description" command="$(command xacro $(var urdf_path))" />
+        <rosparam file="$(find my_urdf_description)/config/ros2_control.yaml" command="load" />
+    </node>
+
+    <execute_process
+        cmd="ros2 control load_controller --set-state active diff_drive_controller"
+        output="screen"
+    />
+
+    <node pkg="gazebo_ros" exec="spawn_entity.py"
+        args="-topic robot_description -entity simple_robot" />
+
+    <node pkg="rviz2" exec="rviz2" output="screen" args="-d $(var rviz_config_path)" />
+
+    <node pkg="tf2_ros" exec="static_transform_publisher" output="screen"
+        args="0 0 0 0 0 0 1 map odom" />
+</launch>
+
